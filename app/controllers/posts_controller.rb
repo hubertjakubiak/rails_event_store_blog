@@ -30,11 +30,12 @@ class PostsController < ApplicationController
     )
     command.call
 
-    post = Post.find(post_id)
-    redirect_to post, notice: "Post was successfully created."
-
-  rescue StandardError => e
-    redirect_to new_post_path, alert: e.message
+    if command.success?
+      post = Post.find(post_id)
+      redirect_to post, notice: "Post was successfully created."
+    else
+      redirect_to posts_path, notice: command.error
+    end
   end
 
   # PATCH/PUT /posts/1 or /posts/1.json
@@ -48,9 +49,11 @@ class PostsController < ApplicationController
     )
     command.call
 
-    redirect_to @post, notice: "Post was successfully updated."
-  rescue StandardError => e
-    redirect_to new_post_path, alert: e.message
+    if command.success?
+      redirect_to @post, notice: "Post was successfully updated."
+    else
+      redirect_to posts_path, notice: command.error
+    end
   end
 
   # DELETE /posts/1 or /posts/1.json
@@ -62,7 +65,11 @@ class PostsController < ApplicationController
     )
     command.call
 
-    redirect_to posts_path, status: :see_other, notice: "Post was successfully destroyed."
+    if command.success?
+      redirect_to posts_path, status: :see_other, notice: "Post was successfully destroyed."
+    else
+      redirect_to posts_path, notice: command.error
+    end
   end
 
   private
