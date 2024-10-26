@@ -21,40 +21,48 @@ class PostsController < ApplicationController
 
   # POST /posts or /posts.json
   def create
-    @post = Post.new(post_params)
+    post_id = SecureRandom.uuid
 
-    respond_to do |format|
-      if @post.save
-        format.html { redirect_to @post, notice: "Post was successfully created." }
-        format.json { render :show, status: :created, location: @post }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @post.errors, status: :unprocessable_entity }
-      end
-    end
+    command = CreatePost.new(
+      post_id: post_id,
+      title: post_params[:title],
+      body: post_params[:body]
+    )
+    command.call
+
+    post = Post.find(post_id)
+    redirect_to post, notice: "Post was successfully created."
+
+  rescue StandardError => e
+    redirect_to new_post_path, alert: e.message
   end
 
   # PATCH/PUT /posts/1 or /posts/1.json
   def update
-    respond_to do |format|
-      if @post.update(post_params)
-        format.html { redirect_to @post, notice: "Post was successfully updated." }
-        format.json { render :show, status: :ok, location: @post }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @post.errors, status: :unprocessable_entity }
-      end
-    end
+    post_id = @post.id
+
+    command = UpdatePost.new(
+      post_id: post_id,
+      title: post_params[:title],
+      body: post_params[:body]
+    )
+    command.call
+
+    redirect_to @post, notice: "Post was successfully updated."
+  rescue StandardError => e
+    redirect_to new_post_path, alert: e.message
   end
 
   # DELETE /posts/1 or /posts/1.json
   def destroy
-    @post.destroy!
+    post_id = @post.id
 
-    respond_to do |format|
-      format.html { redirect_to posts_path, status: :see_other, notice: "Post was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    command = DeletePost.new(
+      post_id: post_id
+    )
+    command.call
+
+    redirect_to posts_path, status: :see_other, notice: "Post was successfully destroyed."
   end
 
   private

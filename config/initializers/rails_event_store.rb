@@ -19,6 +19,11 @@ Rails.configuration.to_prepare do
     store.subscribe_to_all_events(RailsEventStore::LinkByEventType.new)
     store.subscribe_to_all_events(RailsEventStore::LinkByCorrelationId.new)
     store.subscribe_to_all_events(RailsEventStore::LinkByCausationId.new)
+
+    store.subscribe(
+      PostProjection.new,
+      to: [PostCreated, PostUpdated, PostDeleted]
+    )
   end
 
   # Register command handlers below
