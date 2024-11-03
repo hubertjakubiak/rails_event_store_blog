@@ -18,4 +18,3 @@ class DeletePost
     @success
   end
 end
-

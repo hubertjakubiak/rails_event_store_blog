@@ -22,7 +22,7 @@ Rails.configuration.to_prepare do
 
     store.subscribe(
       PostProjection.new,
-      to: [PostCreated, PostUpdated, PostDeleted]
+      to: [ PostCreated, PostUpdated, PostDeleted ]
     )
   end
 
